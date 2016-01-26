@@ -1,0 +1,108 @@
+<!--
+
+    THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS
+    FOR A PARTICULAR PURPOSE. THIS CODE AND INFORMATION ARE NOT SUPPORTED BY XEBIALABS.
+
+-->
+
+<synthetic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns="http://www.xebialabs.com/deployit/synthetic"
+           xsi:schemaLocation="http://www.xebialabs.com/deployit/synthetic synthetic.xsd">
+
+    <!-- configuration types -->
+
+    <type type="remoteScript.OverthereHost" extends="xlrelease.Configuration" versioned="false" virtual="true" description="Machine that runs middleware, on which scripts can be executed, etc.">
+        <!-- common properties -->
+        <property name="os" label="Operating System" kind="enum" enum-class="com.xebialabs.overthere.OperatingSystemFamily" description="Operating system the host runs"/>
+
+        <!-- advanced properties -->
+        <property name="temporaryDirectoryPath" category="Advanced" required="false" description="Directory into which temporary files are stored. Will be cleaned up when the connection is closed."/>
+        <property name="jumpstation" category="Advanced" kind="ci" required="false" referenced-type="remoteScript.Jumpstation" description="Jumpstation that should be used to reach this host"/>
+        <property name="connectionOptions" kind="map_string_string" required="false" category="Advanced" description="Additional connection options passed to the Overthere connection. See the Overthere manual for a complete list of available options."/>
+
+        <!-- internal properties -->
+        <property name="protocol" hidden="true" description="Protocol to use when connecting to this host"/>
+    </type>
+
+    <type type="remoteScript.SshHost" extends="remoteScript.OverthereHost" description="Machine that can be connected to using SSH">
+        <!-- internal properties -->
+        <property name="protocol" default="ssh" hidden="true"/>
+
+        <!-- common properties -->
+        <property name="connectionType" kind="enum" enum-class="com.xebialabs.overthere.ssh.SshConnectionType" required="true" default="SFTP" description="Type of SSH connection to create"/>
+        <property name="address" kind="string" required="true" description="Address of the host"/>
+        <property name="port" kind="integer" required="true" default="22" description="Port on which the SSH server runs"/>
+        <property name="username" kind="string" required="false" description="Username to connect with"/>
+        <property name="password" kind="string" required="false" password="true" description="Password to use for authentication"/>
+        <property name="privateKeyFile" kind="string" required="false" description="Private key file to use for authentication"/>
+        <property name="passphrase" kind="string" required="false" password="true" description="Optional passphrase for the private key in the private key file"/>
+
+        <!-- advanced properties (hidden and shown) -->
+        <property name="sudoUsername" category="Advanced" kind="string" required="false" label="SUDO username" description="Username to sudo to when accessing files or executing commands"/>
+        <property name="suUsername" category="Advanced" kind="string" required="false" label="SU username" description="Username to su to when accessing files or executing commands"/>
+        <property name="suPassword" category="Advanced" kind="string" required="false" password="true" label="SU password" description="Password of user to su to when accessing files or executing commands"/>
+    </type>
+
+    <type type="remoteScript.CifsHost" extends="remoteScript.OverthereHost" description="Machine that can be connected to using either WinRM or Telnet and can perform file manipulation via the CIFS protocol">
+        <!-- internal properties -->
+        <property name="protocol" default="cifs" hidden="true"/>
+
+        <!-- common properties -->
+        <property name="os" kind="enum" enum-class="com.xebialabs.overthere.OperatingSystemFamily" default="WINDOWS" label="Operating System" description="Operating system the host runs"/>
+        <property name="connectionType" kind="enum" enum-class="com.xebialabs.overthere.cifs.CifsConnectionType" required="true" default="WINRM_INTERNAL" description="Type of CIFS connection to create"/>
+        <property name="address" kind="string" required="true" description="Address of the host"/>
+        <property name="port" kind="integer" required="false" description="Port on which the Telnet or WinRM server runs"/>
+        <property name="username" kind="string" required="false" description="Username to connect with"/>
+        <property name="password" kind="string" required="false" password="true" description="Password to use for authentication"/>
+
+        <!-- cifs properties -->
+        <property name="cifsPort" category="CIFS" kind="integer" required="false" default="445" label="CIFS Port" description="Port on which the CIFS server runs"/>
+        <property name="pathShareMappings" category="CIFS" kind="map_string_string" required="false" label="Windows path to Windows share mappings" description="Mapping from Windows paths to Windows share names, e.g. C:\IBM\WebSphere -> WebSphereShare"/>
+
+        <!-- winrm properties -->
+        <property name="winrmEnableHttps" category="WINRM" kind="boolean" required="false" default="false" label="Enable HTTPS for WinRM" description="Enable SSL communication to the WinRM server"/>
+        <property name="winrsAllowDelegate" label="Allow credential delegation" category="WINRM" kind="boolean" default="false" required="false" description="Specifies that the user's credentials can be used to access a remote share, for example, found on a different machine than the target endpoint (WINRM_NATIVE only)"/>
+        <property name="winrsProxy" category="WINRM" kind="ci" required="false" referenced-type="remoteScript.OverthereHost" description="Host on which to run the winrs command. Defaults to localhost. (WINRM_NATIVE only)"/>
+    </type>
+
+    <type type="remoteScript.Jumpstation" extends="remoteScript.OverthereHost" virtual="true" description="Base class for jumpstations">
+        <!-- common properties -->
+        <property name="os" hidden="true" default="UNIX" kind="enum" enum-class="com.xebialabs.overthere.OperatingSystemFamily"/>
+        <property name="temporaryDirectoryPath" hidden="true" required="false" description="The default platform value (/tmp) suffices as no temporary files will be placed on the jumpstation"/>
+    </type>
+
+    <type type="remoteScript.SshJumpstation" extends="remoteScript.Jumpstation" description="Machine that can be used to create a tunneled connection to a destination host">
+        <!-- internal properties -->
+        <property name="protocol" default="ssh" hidden="true"/>
+        <property name="connectionType" kind="enum" enum-class="com.xebialabs.overthere.ssh.SshConnectionType" default="TUNNEL" hidden="true"/>
+
+        <!-- common properties -->
+        <property name="address" kind="string" required="true" description="Address of the host"/>
+        <property name="port" kind="integer" required="true" default="22" description="Port on which the SSH server runs"/>
+        <property name="username" kind="string" required="false" description="Username to connect with"/>
+        <property name="password" kind="string" required="false" password="true" description="Password to use for authentication"/>
+        <property name="privateKeyFile" kind="string" required="false" description="Private key file to use for authentication"/>
+        <property name="passphrase" kind="string" required="false" password="true" description="Optional passphrase for the private key in the private key file"/>
+    </type>
+
+    <!-- task types -->
+
+    <type type="remoteScript.Overthere" extends="xlrelease.PythonScript">
+        <!-- input properties -->
+        <property name="host" kind="ci" referenced-type="remoteScript.OverthereHost" category="input" description="Overthere host to execute the script"/>
+        <property name="username" kind="string" required="false" category="input" description="Username to connect with"/>
+        <property name="password" kind="string" required="false" password="true" category="input" description="Password to use for authentication"/>
+        <property name="privateKeyFile" kind="string" required="false" category="input" description="Private key file to use for authentication"/>
+        <property name="passphrase" kind="string" required="false" password="true" category="input" description="Optional passphrase for the private key in the private key file"/>
+        <property name="connectionOptions" kind="map_string_string" required="false" category="input" description="Additional connection options passed to the Overthere connection. See the Overthere manual for a complete list of available options."/>
+
+        <property name="remotePath" required="false" category="input" description="Remote working directory"/>
+        <property name="script" size="large" category="input" description="Script to execute on the host"/>
+
+        <!-- output properties -->
+        <property name="output" required="false" category="output" description="Console output of the process"/>
+        <property name="error" required="false" category="output" description="Error output of the process"/>
+    </type>
+
+</synthetic>

@@ -1,0 +1,60 @@
+plugins {
+  id "com.github.hierynomus.license" version "0.11.0"
+}
+
+
+version = '1.0.0'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+defaultTasks 'build'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  maven {
+    credentials {
+      username 'community-plugins'
+      password 'community'
+    }
+    url 'http://nexus.xebialabs.com/nexus/content/repositories/releases'
+  }
+}
+
+dependencies {
+  compile "com.xebialabs.overthere:overthere:4.2.1"
+  compile "com.xebialabs.deployit:udm-plugin-api:2015.5.0"
+}
+
+import org.apache.tools.ant.filters.*
+
+processResources {
+  filter ReplaceTokens, tokens: [
+      "project.version"   : project.property("version"),
+      "project.artifactId": project.property("name")
+  ]
+}
+
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = "javadoc"
+  from javadoc.destinationDir
+}
+
+artifacts {
+  archives sourcesJar, javadocJar
+}
+
+license {
+  header rootProject.file('LICENSE')
+  strictCheck true
+}

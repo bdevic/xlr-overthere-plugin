@@ -1,0 +1,37 @@
+# use glob syntax.
+syntax: glob
+.gradle/
+
+# Gradle environment specific properties
+
+# Build output
+build/
+out/
+target/
+bin/
+src/main/resources/web/help/onlinehelp
+# Maven
+pom.xml
+
+# Eclipse
+.metadata/
+.settings/
+.classpath
+.project
+.pydevproject
+.scala_dependencies
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+s101plugin.state
+classes
+
+# Mac
+.DS_Store
+
+# Tmp files
+*~
